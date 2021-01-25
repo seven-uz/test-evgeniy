@@ -73,266 +73,283 @@ if(isset($_POST['table_name'])){
          
       </div>
 
-      <div class="statistics" id="statistics">
-         <div class="info__item">
-            <h4>Lorem, ipsum.</h4>
-            <p>245</p>
-         </div>
-         <div class="info__item">
-            <h4>Lorem, ipsum.</h4>
-            <p>32</p>
-         </div>
-         <div class="info__item">
-            <h4>Lorem, ipsum.</h4>
-            <p>123</p>
-         </div>
-         <div class="info__item">
-            <h4>Lorem, ipsum.</h4>
-            <p>54</p>
-         </div>
-      </div>
-
       <div class="db_table" id="db_table">
+         <h2>Таблицы</h2>
          <table class="table">
             <thead>
                <tr>
-                  <th></th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
+                  <th>ID</th>
+                  <th>Тип машина</th>
+                  <th>Цвет</th>
+                  <th>Макс. скорость</th>
+                  <th>Макс. скорость</th>
                </tr>
             </thead>
             <tbody>
-      <?
-         $lines = file('rows-in-tables.sql');
-         $lines2 = file_get_contents('rows-in-tables.sql');
-         $lines2 = preg_split("~\\n(?=\\s+)~",$lines2);
-         $lines2r = preg_grep("~Дамп данных~ui",$lines2);
+               <?
+                  $lines = file('rows-in-tables.sql');
+                  $lines2 = file_get_contents('rows-in-tables.sql');
+                  $lines2 = preg_split("~\\n(?=\\s+)~",$lines2);
+                  $lines2r = preg_grep("~Дамп данных~ui",$lines2);
 
-         function get_string_between($string, $start, $end){
-            $string = ' ' . $string;
-            $ini = strpos($string, $start);
-            if ($ini == 0) return '';
-            $ini += strlen($start);
-            $len = strpos($string, $end, $ini) - $ini;
-            return substr($string, $ini, $len);
-         }
-
-         $parsed = get_string_between($lines2, '`', '`');
-         print_r($lines2);
-
-         foreach ($lines as $line) {
-            echo '<tr>';
-            if (substr($line, 0, 2) == '--' || $line == '' || substr($line, 0, 1)  != '(') continue;
-            $line = str_replace("(", "", $line);
-            $line = str_replace(")", "", $line);
-            // if (substr(trim($line), 1) == '(') {
-               $explode = explode(',', $line);
-               foreach($explode as $asd => $key){
-                  echo 
-                     '<td>'.$key.'</td>';
+                  function get_string_between($string, $start, $end){
+                     $string = ' ' . $string;
+                     $ini = strpos($string, $start);
+                     if ($ini == 0) return '';
+                     $ini += strlen($start);
+                     $len = strpos($string, $end, $ini) - $ini;
+                     return substr($string, $ini, $len);
                   }
-                  echo '</tr>';
-            // }
-         }
-      ?>
-         
-               
+
+                  $parsed = get_string_between($lines2, '`', '`');
+
+                  foreach ($lines as $line) {
+                     echo '<tr>';
+                     if (substr($line, 0, 2) == '--' || $line == '' || substr($line, 0, 1)  != '(') continue;
+                     $line = str_replace("(", "", $line);
+                     $line = str_replace(")", "", $line);
+                     $line = str_replace(" ", "", $line);
+                        $explode = explode(',', $line);
+                        foreach($explode as $asd => $key){
+                           $key = str_replace("'", "", $key);
+                           $key = str_replace(";", "", $key);
+                           echo '<td>'.$key.'</td>';
+                        }
+                           echo '</tr>';
+                  }
+               ?>
             </tbody>
          </table>
       </div>
 
       <div class="addtobase" id="addtobase">
-         <form action="#" method="post" class="addtobase__form">
-            <table>
-               <tbody>
-                  <tr>
-                     <td>База данных:</td>
-                     <td>
-                        <select name="db_list" required>
-                           <option value="" selected disabled>Выберите база данных</option>
-                           <?
-                           $fd = file("bases.txt") or die("не удалось открыть файл");
-                           foreach ($fd as $lines) {
-                              echo '<option value="'.$lines.'">'.$lines.'</option>';
-                           }
-                           fclose($fd);
-                           ?>
-                        </select>
-                     </td>
-                     <td><a class="btn" id="add_db_btn" style="padding:10px;max-width:300px;">Добавить новый баз данных</a></td>
-                  </tr>
-               </tbody>
-            </table>
-            <table>
-               <tbody>
-                  <tr>
-                     <td>Имя таблицы:</td>
-                     <td><input type="text" name="table_name" maxlength="64" value="" autofocus="" required=""></td>
-                     <td align="right">Добавить</td>
-                     <td align="center"><input type="number" name="added_fields" value="1" min="1" onfocus="this.select()"></td>
-                     <td>поле(я)</td>
-                     <td><input class="btn" type="button" name="submit_num_fields" value="Вперёд"></td>
-                  </tr>
-               </tbody>
-            </table>
-            <hr>
-            <table class="addtobase__table">
-               <thead>
-                  <tr>
-                     <th>Имя</th>
-                     <th>Тип</th>
-                     <th>Длина/Значения</th>
-                     <th>Индекс</th>
-                     <th>A_I</th>
-                  </tr>
-               </thead>
-               <tbody>
-                  <tr>
-                     <td><input type="text"></td>
-                     <td>
-                        <select name="type">
-                           <option value="int">INT</option>
-                           <option value="varchar">VARCHAR</option>
-                           <option value="text">TEXT</option>
-                        </select>
-                     </td>
-                     <td><input class="small" type="number"></td>
-                     <td>
-                        <select name="21321">
-                           <option value="primary">primary</option>
-                           <option value="unique">unique</option>
-                           <option value="index">index</option>
-                           <option value="fulltext">fulltext</option>
-                           <option value="spatial">spatial</option>
-                        </select>
-                     </td>
-                     <td>
-                        <input type="checkbox" name="ai">
-                     </td>
-                  </tr>
-                  <tr>
-                     <td><input type="text"></td>
-                     <td>
-                        <select name="type">
-                           <option value="int">INT</option>
-                           <option value="varchar">VARCHAR</option>
-                           <option value="text">TEXT</option>
-                        </select>
-                     </td>
-                     <td><input class="small" type="number"></td>
-                     <td>
-                        <select name="21321">
-                           <option value="primary">primary</option>
-                           <option value="unique">unique</option>
-                           <option value="index">index</option>
-                           <option value="fulltext">fulltext</option>
-                           <option value="spatial">spatial</option>
-                        </select>
-                     </td>
-                     <td>
-                        <input type="checkbox" name="ai">
-                     </td>
-                  </tr>
-                  <tr>
-                     <td><input type="text"></td>
-                     <td>
-                        <select name="type">
-                           <option value="int">INT</option>
-                           <option value="varchar">VARCHAR</option>
-                           <option value="text">TEXT</option>
-                        </select>
-                     </td>
-                     <td><input class="small" type="number"></td>
-                     <td>
-                        <select name="21321">
-                           <option value="primary">primary</option>
-                           <option value="unique">unique</option>
-                           <option value="index">index</option>
-                           <option value="fulltext">fulltext</option>
-                           <option value="spatial">spatial</option>
-                        </select>
-                     </td>
-                     <td>
-                        <input type="checkbox" name="ai">
-                     </td>
-                  </tr>
-                  <tr>
-                     <td><input type="text"></td>
-                     <td>
-                        <select name="type">
-                           <option value="int">INT</option>
-                           <option value="varchar">VARCHAR</option>
-                           <option value="text">TEXT</option>
-                        </select>
-                     </td>
-                     <td><input class="small" type="number"></td>
-                     <td>
-                        <select name="21321">
-                           <option value="primary">primary</option>
-                           <option value="unique">unique</option>
-                           <option value="index">index</option>
-                           <option value="fulltext">fulltext</option>
-                           <option value="spatial">spatial</option>
-                        </select>
-                     </td>
-                     <td>
-                        <input type="checkbox" name="ai">
-                     </td>
-                  </tr>
-               </tbody>
-            </table>  
-            <hr>
-            <table class="addtobase__table">
-               <tbody>
-                  <tr>
-                     <td><input type="text" name="comment"></td>
-                     <td>
-                        <select name="type_table">
-                           <option value="csv">CSV</option>
-                           <option value="mrg_myisam">MRG_MyISAM</option>
-                           <option value="memory">MEMORY</option>
-                           <option value="myisam">MyISAM</option>
-                           <option value="sequence">SEQUENCE</option>
-                           <option value="innodb">InnoDB</option>
-                           <option value="aria">Aria</option>
-                        </select>
-                     </td>
-                     <td>
-                        <input type="submit" class="btn" value="Сохранить">
-                     </td>
-                  </tr>
-               </tbody>
-            </table> 
-         </form>
-         <?php
-$tables = 'testbase-tables.sql';
+         <div class="container">
+            <h2>Форма добавления данные на базу данных</h2>
+            <form action="#" method="post" class="addtobase__form">
+               <table>
+                  <tbody>
+                     <tr>
+                        <td>База данных:</td>
+                        <td>
+                           <select name="db_list" required>
+                              <option value="" selected disabled>Выберите база данных</option>
+                              <?
+                              $fd = file("bases.txt") or die("не удалось открыть файл");
+                              foreach ($fd as $lines) {
+                                 echo '<option value="'.$lines.'">'.$lines.'</option>';
+                              }
+                              fclose($fd);
+                              ?>
+                           </select>
+                        </td>
+                        <td><a class="btn" id="add_db_btn" target=".add_db" style="padding:10px;max-width:300px;">Добавить новый баз данных</a></td>
+                     </tr>
+                  </tbody>
+               </table>
+               <table>
+                  <tbody>
+                     <tr>
+                        <td>Имя таблицы:</td>
+                        <td><input type="text" name="table_name" maxlength="64" value="" required=""></td>
+                        <td align="right">Добавить</td>
+                        <td align="center"><input type="number" name="added_fields" value="1" min="1" onfocus="this.select()"></td>
+                        <td>поле(я)</td>
+                        <td><input class="btn" type="button" name="submit_num_fields" value="Вперёд"></td>
+                     </tr>
+                  </tbody>
+               </table>
+               <hr>
+               <table class="addtobase__table">
+                  <thead>
+                     <tr>
+                        <th>Имя</th>
+                        <th>Тип</th>
+                        <th>Длина/Значения</th>
+                        <th>Индекс</th>
+                        <th>A_I</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr>
+                        <td><input type="text"></td>
+                        <td>
+                           <select name="type">
+                              <option value="int">INT</option>
+                              <option value="varchar">VARCHAR</option>
+                              <option value="text">TEXT</option>
+                           </select>
+                        </td>
+                        <td><input class="small" type="number"></td>
+                        <td>
+                           <select name="21321">
+                              <option value="primary">primary</option>
+                              <option value="unique">unique</option>
+                              <option value="index">index</option>
+                              <option value="fulltext">fulltext</option>
+                              <option value="spatial">spatial</option>
+                           </select>
+                        </td>
+                        <td>
+                           <input type="checkbox" name="ai">
+                        </td>
+                     </tr>
+                     <tr>
+                        <td><input type="text"></td>
+                        <td>
+                           <select name="type">
+                              <option value="int">INT</option>
+                              <option value="varchar">VARCHAR</option>
+                              <option value="text">TEXT</option>
+                           </select>
+                        </td>
+                        <td><input class="small" type="number"></td>
+                        <td>
+                           <select name="21321">
+                              <option value="primary">primary</option>
+                              <option value="unique">unique</option>
+                              <option value="index">index</option>
+                              <option value="fulltext">fulltext</option>
+                              <option value="spatial">spatial</option>
+                           </select>
+                        </td>
+                        <td>
+                           <input type="checkbox" name="ai">
+                        </td>
+                     </tr>
+                     <tr>
+                        <td><input type="text"></td>
+                        <td>
+                           <select name="type">
+                              <option value="int">INT</option>
+                              <option value="varchar">VARCHAR</option>
+                              <option value="text">TEXT</option>
+                           </select>
+                        </td>
+                        <td><input class="small" type="number"></td>
+                        <td>
+                           <select name="21321">
+                              <option value="primary">primary</option>
+                              <option value="unique">unique</option>
+                              <option value="index">index</option>
+                              <option value="fulltext">fulltext</option>
+                              <option value="spatial">spatial</option>
+                           </select>
+                        </td>
+                        <td>
+                           <input type="checkbox" name="ai">
+                        </td>
+                     </tr>
+                     <tr>
+                        <td><input type="text"></td>
+                        <td>
+                           <select name="type">
+                              <option value="int">INT</option>
+                              <option value="varchar">VARCHAR</option>
+                              <option value="text">TEXT</option>
+                           </select>
+                        </td>
+                        <td><input class="small" type="number"></td>
+                        <td>
+                           <select name="21321">
+                              <option value="primary">primary</option>
+                              <option value="unique">unique</option>
+                              <option value="index">index</option>
+                              <option value="fulltext">fulltext</option>
+                              <option value="spatial">spatial</option>
+                           </select>
+                        </td>
+                        <td>
+                           <input type="checkbox" name="ai">
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>  
+               <hr>
+               <table class="addtobase__table">
+                  <tbody>
+                     <tr>
+                        <td><input type="text" name="comment" placeholder="Комментарии к таблице:"></td>
+                        <td>
+                           <select name="type_table" required>
+                              <option value="" disabled selected>Тип таблиц:</option>
+                              <option value="csv" title="Stores tables as CSV files">CSV</option>
+                              <option value="mrg_myisam" title="Collection of identical MyISAM tables">MRG_MyISAM</option>
+                              <option value="memory" title="Hash based, stored in memory, useful for temporary tables">MEMORY</option>
+                              <option value="myisam" title="Non-transactional engine with good performance and small data footprint">MyISAM</option>
+                              <option value="sequence" title="Generated tables filled with sequential values">SEQUENCE</option>
+                              <option value="innodb" title="Supports transactions, row-level locking, foreign keys and encryption for tables">InnoDB</option>
+                              <option value="aria" title="Crash-safe tables with MyISAM heritage">Aria</option>
+                           </select>
+                        </td>
+                        <td>
+                           <input type="submit" class="btn" value="Сохранить">
+                        </td>
+                     </tr>
+                  </tbody>
+               </table> 
+            </form>
+            <?php
 
+            // $mysql_host = 'localhost';
+            // $mysql_username = 'root';
+            // $mysql_password = '';
+            // $mysql_database = 'yangibaza';
 
-      // $mysql_host = 'localhost';
-      // $mysql_username = 'root';
-      // $mysql_password = '';
-      // $mysql_database = 'yangibaza';
+            // $dd = mysqli_connect($mysql_host, $mysql_username, $mysql_password, $mysql_database) or die('Error connecting to MySQL server: ' . mysql_error());
 
-      // $dd = mysqli_connect($mysql_host, $mysql_username, $mysql_password, $mysql_database) or die('Error connecting to MySQL server: ' . mysql_error());
+            // $templine = '';
+            // $lines = file($filename);
+            // foreach ($lines as $line) {
+            //    if (substr($line, 0, 2) == '--' || $line == '') continue;
 
-      // $templine = '';
-      // $lines = file($filename);
-      // foreach ($lines as $line) {
-      //    if (substr($line, 0, 2) == '--' || $line == '') continue;
+            //    $templine .= $line;
+            //    if (substr(trim($line), -1, 1) == ';') {
+            //    $mys = mysqli_query($dd, $templine);
+            //    echo $templine.'<br>';
+            //    $templine = '';
+            //    }
+            // }
 
-      //    $templine .= $line;
-      //    if (substr(trim($line), -1, 1) == ';') {
-      //    $mys = mysqli_query($dd, $templine);
-      //    echo $templine.'<br>';
-      //    $templine = '';
-      //    }
-      // }
-
-         ?>
+            ?>
+         </div>
       </div>
 
    </main>
+   <footer>
+      
+   </footer>
+   <div class="modals" id="mm">
+      <div class="item add_db">
+         <div class="modals__header">
+            <h2 class="modals__title">Добавить новый база данных</h2>
+            <div class="modals__close" target=".add_db"></div>
+         </div>
+         <form action="#" method="post">
+            <div class="modals__body">
+               <label for="db_name">Имя нового базу данных:</label>
+               <input type="text" name="db_name" id="db_name">
+            </div>
+            <div class="modals__footer">
+               <input type="submit" class="btn" value="Добавить">
+            </div>
+         </form>
+      </div>
+      <div class="item add_db2">
+         <div class="modals__header">
+            <h2 class="modals__title">Добавить новый база данных</h2>
+            <div class="modals__close"></div>
+         </div>
+         <form action="#" method="post">
+            <div class="modals__body">
+               <label for="db_name">Имя нового базу данных:</label>
+               <input type="text" name="db_name" id="db_name">
+            </div>
+            <div class="modals__footer">
+               <input type="submit" class="btn" value="Добавить">
+            </div>
+         </form>
+      </div>
+   </div>
    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
    <!-- Owl-carousel -->
    <script src="/node_modules/owl.carousel/dist/owl.carousel.min.js"></script>
@@ -343,7 +360,19 @@ $tables = 'testbase-tables.sql';
          nav:true,
          items:1,
          autoHeight: true,
-      })
+      });
+
+      $('#add_db_btn').click(function(){
+         let thisid = $(this).attr('target');
+         $('.modals').css("display", "flex");
+         $(thisid).addClass("active");
+      });
+      
+      $('.modals__close').click(function(){
+         let thisid = $(this).attr('target');
+         $('.modals').css("display", "none");
+         $(thisid).removeClass("active");
+      });
    </script>
 </body>
 </html>

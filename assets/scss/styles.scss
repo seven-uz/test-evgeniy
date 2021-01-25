@@ -29,8 +29,32 @@ body{
    &:hover{
       border: 1px solid $color-hover;
       color: #fff !important;
-      box-shadow: 0 0 20px 0 $color-hover;
+      box-shadow: 0 0 20px 0 rgba($color-hover, .7);
    }
+}
+
+.table{
+   width: 100%;
+   border-collapse: collapse;
+   margin: 40px 0;
+   td{
+      border-bottom: 1px solid rgba(#000, .2);
+      padding: 5px;
+   }
+}
+
+input, select, textarea{
+   outline: none;
+   padding: 10px;
+   border: 1px solid rgba(#000000,.2);
+   @include border-radius(4px);
+   &:focus{
+      border:1px solid $color-hover;
+      box-shadow: 0 0 10px 0 rgba($color-hover, .2);
+   }
+}
+label{
+   margin-right: 20px;
 }
 
 .header{
@@ -117,12 +141,14 @@ body{
    &__item {
    }
 }
-.statistics {
-}
 
 .addtobase{
-   max-width: 1400px;
-   margin: 0 auto;
+   background: rgba(#000, .1);
+   padding: 10px 0;
+   .container{
+      max-width: 1400px;
+      margin: 0 auto;
+   }
    table{
       margin-bottom: 20px;
    }
@@ -134,23 +160,89 @@ body{
       }
    }
    input, select{
-      outline: none;
-      padding: 10px;
-      border: 1px solid rgba(#000000,.2);
-      @include border-radius(4px);
       width: 95%;
       &[type="number"]{
          max-width: 70px;
          text-align: center;
-      }
-      &:focus{
-         border:1px solid $color-hover;
       }
       &.small{
          max-width: 100px;
       }
    }
 }
-.table {
+.db_table {
+   max-width: 1400px;
+   margin: 0 auto;
+}
 
+.modals{
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100vh;
+   backdrop-filter: blur(2px);
+   align-items: center;
+   justify-content: center;
+   z-index: 1000;
+   display: none;
+
+   .item{
+      display: none;
+      @include border-radius;
+      max-width: 1200px;
+      width: 90%;
+      background: #fff;
+      box-shadow: 0 0 30px 0px rgba(#000, .15);
+      animation: modalshow .4s;
+      -webkit-animation: modalshow .4s;
+      z-index: 1001;
+      &.active{
+         display: block;
+      }
+   }
+   &__header{
+      font-size: 15px;
+      padding: 15px 20px;
+      border-bottom: 1px solid rgba(#000, .2);
+      display: flex;
+      justify-content: space-between;
+   }
+   &__title{
+      margin: 0;
+   }
+   &__body{
+      padding: 40px 20px;
+      height: 100%;
+      max-height: 60vh;
+      overflow: hidden;
+      overflow-y: auto;
+   }
+   &__footer{
+      padding: 20px;
+      border-top: 1px solid rgba(#000, .2);
+      .btn{
+         margin-left: auto;
+      }
+   }
+   &__close{
+      &:before{
+         content: '\00d7';
+         color: #000;
+         font-weight: bold;
+         font-size: 20px;
+         font-family: Arial, sans-serif;
+         cursor: pointer;
+         padding: 10px;
+      }
+   }
+}
+
+@keyframes modalshow{
+   0%{
+      margin-bottom: 50px;
+   }
+   100%{
+      margin: 0;
+   }
 }
