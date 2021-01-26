@@ -1,31 +1,5 @@
 <?
    require 'functions.php';
-
-
-if(isset($_POST['table_name'])){
-   $filename = 'tables.sql';
-   $fd = fopen($filename, 'a+') or die("не удалось создать файл");
-   $str = "CREATE TABLE `yangibaza`.`".$_POST['table_name']."` (
-   `id` int(11) NOT NULL,
-   `ordno` int(11) NOT NULL,
-   `kvmot` decimal(15,2) NOT NULL,
-   `kuni` date NOT NULL,
-   `status` tinyint(3) NOT NULL
-) ENGINE = MyISAM CHARSET=utf8 COLLATE utf8_general_ci;
-
-";
-   fwrite($fd, $str);
-   fclose($fd);
-   // CREATE TABLE IF NOT EXIST `yangibaza`.`haha` ( `id` TEXT NOT NULL AUTO_INCREMENT , `login` INT NOT NULL , `password` VARCHAR(250) NOT NULL , PRIMARY KEY (`id`)) ENGINE = MyISAM CHARSET=utf8 COLLATE utf8_general_ci;
-
-   // INSERT INTO `yangibaza`.`321`
-   // (`id`, `ordno`, `kvmot`, `kuni`, `status`) VALUES 
-   // (1,2131,5,2020-05-10,0),
-   // (1,2131,5,2020-05-10,0),
-   // (1,2131,5,2020-05-10,0),
-   // (1,2131,5,2020-05-10,0);
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -71,10 +45,6 @@ if(isset($_POST['table_name'])){
       </div>
    </header>
    <main>
-      <div class="info" id="info">
-         
-      </div>
-
       <div class="db_table" id="db_table">
          <div class="db_table__header">
             <h2>Таблицы</h2>
@@ -165,7 +135,6 @@ if(isset($_POST['table_name'])){
             <hr>
             <div class="db_table__header">
                <h2>Форма добавления данные на базу данных</h2>
-               <div class="btn add-field" style="padding:10px">Добавить поле</div>
             </div>
             <form id="add-in-table">
                <table class="table not-border" id="add-to-tables-form">
@@ -191,14 +160,9 @@ if(isset($_POST['table_name'])){
                         echo '
                         <tr>
                            <td>'.$value.'</td>
-                           <td><input type="text" name="'.$value.'[]"></td>
+                           <td><input type="text" name="'.$value.'"></td>
                         </tr>
                         ';
-                        $json[] .= '<div class="hidden fields" data-field="'.$value.'">'.$value.'</div>';
-                        foreach($json as $key){
-                           echo $key;
-                        }
-                        $json = [];
                      }
                   ?>
                   </tbody>
@@ -430,35 +394,6 @@ if(isset($_POST['table_name'])){
 
          newRow.append(cols);
          $("#new-fields").append(newRow);
-      });
-
-      $( ".add-field" ).click(function() {
-
-      //    $('.summa').each(function() {
-      //       if($(this).text()!=""){
-      //       totalAmount += parseInt($(this).html());
-      //       }
-      //       if(totalAmount > 0){
-      //       $(".nextBtn").removeClass('uchiq');
-      //       }else{
-      //       $(".nextBtn").addClass('uchiq');
-      //       }
-      //   });
-
-         $('.fields').each(function() {
-            
-            let target = $(this).attr("data-field");
-            console.log(target)
-            
-            var newRow = $("<tr>");
-            cols = "";
-
-            cols += '<td>'+target+'</td><td><input type="text" name="'+target+'[]"></td>';
-
-            newRow.append(cols);
-            $("#add-to-tables-form").append(newRow);
-
-         });
       });
    </script>
 </body>

@@ -58,4 +58,9 @@ INSERT INTO `samsung` (`id`, `ordno`, `kvmot`, `kuni`, `status`) VALUES
    `Array` () NOT NULL,
    `phones` () NOT NULL,
    `samsung` () NOT NULL
-) ENGINE= DEFAULT CHARSET=utf8;
+) ENGINE= DEFAULT CHARSET=utf8;INSERT INTO `xiaomi` (`id`,`model`,`cpu`,`ram`) VALUES (`3`,`asfa`,`123412`,`41251tfgds`);
+INSERT INTO `xiaomi` (`id`,`model`,`cpu`,`ram`) VALUES (`3`,`asfa`,`123412`,`41251tfgds`);
+INSERT INTO `xiaomi` (`id`,`model`,`cpu`,`ram`) VALUES (`3`,`asfa`,`123412`,`41251tfgds`);
+INSERT INTO `xiaomi` (`id`,`model`,`cpu`,`ram`) VALUES (`3`,`asfa`,`123412`,`41251tfgds`);
+INSERT INTO `samsung` (`id`,`weight`,`camera`,`battery`,`display`,`Array`,`phones`,`samsung`) VALUES (`412`,`4214`,`421`,`421`,`414`,`12`,`512`,`51261`);
+INSERT INTO `xiaomi` (`id`,`model`,`cpu`,`ram`) VALUES (`1`,`2`,`3`,`4`);
