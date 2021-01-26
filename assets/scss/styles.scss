@@ -37,10 +37,22 @@ body{
    width: 100%;
    border-collapse: collapse;
    margin: 40px 0;
-   td{
+   td,th{
       border-bottom: 1px solid rgba(#000, .2);
       padding: 5px;
    }
+   &.not-border{
+      td,th{
+         border: none;
+         text-align: left;
+      }
+   }
+}
+
+.hidden{
+   overflow: hidden !important;
+   display: none !important;
+   opacity: 0 !important;
 }
 
 input, select, textarea{
@@ -170,9 +182,27 @@ label{
       }
    }
 }
+
 .db_table {
    max-width: 1400px;
    margin: 0 auto;
+   padding: 20px 0 40px;
+   &__header{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+   }
+   &__link{
+      display: flex;
+      flex-wrap: wrap;
+   }
+   &__item{
+      margin: 10px;
+      padding: 10px;
+      background: $color-hover;
+      color: #ffffff;
+      @include border-radius;
+   }
 }
 
 .modals{
@@ -235,6 +265,38 @@ label{
          cursor: pointer;
          padding: 10px;
       }
+   }
+}
+
+.toast-top-full-width{
+   width: 100%;
+   z-index: 1001;
+   position: fixed;
+   top: 0;
+   left: 0;
+}
+.toast{
+   margin: 15px auto;
+   width: 300px;
+   @include border-radius;
+   padding: 10px;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   color: #ffffff;
+   &-close-button{
+      outline: none;
+      background: none;
+      border:none;
+      color: #ffffff;
+      cursor: pointer;
+      padding: 10px;
+   }
+   &-success{
+      background: green;
+   }
+   &-error{
+      background: red;
    }
 }
 

@@ -303,9 +303,20 @@ body {
   margin: 40px 0;
 }
 
-.table td {
+.table td, .table th {
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   padding: 5px;
+}
+
+.table.not-border td, .table.not-border th {
+  border: none;
+  text-align: left;
+}
+
+.hidden {
+  overflow: hidden !important;
+  display: none !important;
+  opacity: 0 !important;
 }
 
 input, select, textarea {
@@ -481,6 +492,39 @@ label {
 .db_table {
   max-width: 1400px;
   margin: 0 auto;
+  padding: 20px 0 40px;
+}
+
+.db_table__header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.db_table__link {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.db_table__item {
+  margin: 10px;
+  padding: 10px;
+  background: #0060C1;
+  color: #ffffff;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
 }
 
 .modals {
@@ -563,6 +607,52 @@ label {
   font-family: Arial, sans-serif;
   cursor: pointer;
   padding: 10px;
+}
+
+.toast-top-full-width {
+  width: 100%;
+  z-index: 1001;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.toast {
+  margin: 15px auto;
+  width: 300px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  padding: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  color: #ffffff;
+}
+
+.toast-close-button {
+  outline: none;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.toast-success {
+  background: green;
+}
+
+.toast-error {
+  background: red;
 }
 
 @-webkit-keyframes modalshow {

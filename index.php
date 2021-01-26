@@ -1,4 +1,6 @@
 <?
+   require 'functions.php';
+
 
 if(isset($_POST['table_name'])){
    $filename = 'tables.sql';
@@ -74,71 +76,158 @@ if(isset($_POST['table_name'])){
       </div>
 
       <div class="db_table" id="db_table">
-         <h2>Таблицы</h2>
-         <table class="table">
-            <thead>
-               <tr>
-                  <th>ID</th>
-                  <th>Тип машина</th>
-                  <th>Цвет</th>
-                  <th>Макс. скорость</th>
-                  <th>Макс. скорость</th>
-               </tr>
-            </thead>
-            <tbody>
+         <div class="db_table__header">
+            <h2>Таблицы</h2>
+            <select onchange="if (this.value) window.location.href = this.value">
                <?
-                  $lines = file('rows-in-tables.sql');
-                  $lines2 = file_get_contents('rows-in-tables.sql');
-                  $lines2 = preg_split("~\\n(?=\\s+)~",$lines2);
-                  $lines2r = preg_grep("~Дамп данных~ui",$lines2);
-
-                  function get_string_between($string, $start, $end){
-                     $string = ' ' . $string;
-                     $ini = strpos($string, $start);
-                     if ($ini == 0) return '';
-                     $ini += strlen($start);
-                     $len = strpos($string, $end, $ini) - $ini;
-                     return substr($string, $ini, $len);
+               if(empty($_GET['database'])){
+                  echo '<option value="" selected disabled>Выберите один из база данных:</option>';
+               }else{
+                  echo '<option value="" disabled>Выберите один из база данных:</option>';
+               }
+                  $databases = array_diff(scandir("miniDB"), array('..', '.'));
+                  if(count ($databases) > 0){
+                     foreach ($databases as $db) {
+                        $db = str_replace(".sql","",$db);
+                        echo '<option value="?database='.$db.'"'; if($_GET['database'] == $db) echo ' selected'; echo '>'.$db.'</option>';
+                     }
                   }
-
-                  $parsed = get_string_between($lines2, '`', '`');
-
-                  foreach ($lines as $line) {
-                     echo '<tr>';
-                     if (substr($line, 0, 2) == '--' || $line == '' || substr($line, 0, 1)  != '(') continue;
-                     $line = str_replace("(", "", $line);
-                     $line = str_replace(")", "", $line);
-                     $line = str_replace(" ", "", $line);
-                        $explode = explode(',', $line);
-                        foreach($explode as $asd => $key){
-                           $key = str_replace("'", "", $key);
-                           $key = str_replace(";", "", $key);
-                           echo '<td>'.$key.'</td>';
-                        }
-                           echo '</tr>';
-                  }
+                  fclose($databases);
                ?>
-            </tbody>
-         </table>
+            </select>
+         </div>
+         <?
+         if(isset($_GET['database'])){
+            echo '<div class="db_table__link">';
+            $table_inside = file('miniDB/'.$_GET['database'].'.sql') or die("не удалось открыть файл");
+            foreach ($table_inside as $value) {
+               if (substr($value, 0, 6) !== "CREATE") continue;
+               $value = str_replace('CREATE TABLE ', '', $value);
+               $value = str_replace('`', '', $value);
+               $value = str_replace('(', '', $value);
+               $value = trim($value);
+               echo '<a class="db_table__item btn" href="?database='.$_GET['database'].'&datatable='.$value.'#db_table">'.$value.'</a>';
+
+            }
+            echo '</div>';
+            ?>
+            <table class="table">
+               <thead>
+                  <tr>
+                     <th>ID</th>
+                     <th>Тип машина</th>
+                     <th>Цвет</th>
+                     <th>Макс. скорость</th>
+                     <th>Макс. скорость</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  <?
+                     $lines = file('miniDB/'.$_GET['database'].'.sql');
+                     $lines2 = file_get_contents('rows-in-tables.sql');
+                     $lines2 = preg_split("~\\n(?=\\s+)~",$lines2);
+                     $lines2r = preg_grep("~Дамп данных~ui",$lines2);
+
+                     function get_string_between($string, $start, $end){
+                        $string = ' ' . $string;
+                        $ini = strpos($string, $start);
+                        if ($ini == 0) return '';
+                        $ini += strlen($start);
+                        $len = strpos($string, $end, $ini) - $ini;
+                        return substr($string, $ini, $len);
+                     }
+
+                     $parsed = get_string_between($lines2, '`', '`');
+
+                     foreach ($lines as $line) {
+                        echo '<tr>';
+                        if (substr($line, 0, 2) == '--' || $line == '' || substr($line, 0, 1)  != '(') continue;
+                        $line = str_replace("(", "", $line);
+                        $line = str_replace(")", "", $line);
+                        $line = str_replace(" ", "", $line);
+                           $explode = explode(',', $line);
+                           foreach($explode as $asd => $key){
+                              $key = str_replace("'", "", $key);
+                              $key = str_replace(";", "", $key);
+                              echo '<td>'.$key.'</td>';
+                           }
+                        echo '</tr>';
+                     }
+                  ?>
+               </tbody>
+            </table>
+         <?}else{?>
+            <h3>База данных не выбрана. пожалуйста, выберите базу данных</h3>
+         <?}?>
+
+         
+         <?if(isset($_GET['datatable'])){?>
+            <hr>
+            <div class="db_table__header">
+               <h2>Форма добавления данные на базу данных</h2>
+               <div class="btn add-field" style="padding:10px">Добавить поле</div>
+            </div>
+            <form id="add-in-table">
+               <table class="table not-border" id="add-to-tables-form">
+                  <thead>
+                     <tr>
+                        <th>Имя поле</th>
+                        <th>Значение</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                  <?
+                     $table_inside2 = file('miniDB/'.$_GET['database'].'.sql');
+                     foreach ($table_inside2 as $value) {
+                        $value = trim($value);
+                        if(substr($value, 0, 6) === 'CREATE'){
+                           $table = str_replace('CREATE TABLE ','',$value);
+                           $table = str_replace('`','',$table);
+                           $table = str_replace('(','',$table);
+                           $table = trim($table);
+                        }
+                        if (substr($value, 0, 1) !== "`" or $_GET['datatable'] !== $table) continue;
+                        $value = strtok($value, '`');
+                        echo '
+                        <tr>
+                           <td>'.$value.'</td>
+                           <td><input type="text" name="'.$value.'[]"></td>
+                        </tr>
+                        ';
+                        $json[] .= '<div class="hidden fields" data-field="'.$value.'">'.$value.'</div>';
+                        foreach($json as $key){
+                           echo $key;
+                        }
+                        $json = [];
+                     }
+                  ?>
+                  </tbody>
+               </table>
+               <input type="hidden" name="database" value="<?=$_GET['database']?>">
+               <input type="hidden" name="datatable" value="<?=$_GET['datatable']?>">
+               <div><input type="submit" value="Сохранить" class="btn"></div>
+            </form>
+         <?}?>
       </div>
 
       <div class="addtobase" id="addtobase">
          <div class="container">
-            <h2>Форма добавления данные на базу данных</h2>
-            <form action="#" method="post" class="addtobase__form">
+            <h2>Форма добавления таблицы на базу данных</h2>
+            <form id="addtobase_form">
                <table>
                   <tbody>
                      <tr>
                         <td>База данных:</td>
                         <td>
-                           <select name="db_list" required>
+                           <select name="database" required>
                               <option value="" selected disabled>Выберите база данных</option>
                               <?
-                              $fd = file("bases.txt") or die("не удалось открыть файл");
-                              foreach ($fd as $lines) {
-                                 echo '<option value="'.$lines.'">'.$lines.'</option>';
+                              $files = array_diff(scandir("miniDB"), array('..', '.'));
+                              foreach ($files as $db) {
+                                 $db = str_replace(".sql","",$db);
+                                 echo '<option value="'.$db.'">'.$db.'</option>';
                               }
-                              fclose($fd);
+                              fclose($files);
                               ?>
                            </select>
                         </td>
@@ -151,15 +240,11 @@ if(isset($_POST['table_name'])){
                      <tr>
                         <td>Имя таблицы:</td>
                         <td><input type="text" name="table_name" maxlength="64" value="" required=""></td>
-                        <td align="right">Добавить</td>
-                        <td align="center"><input type="number" name="added_fields" value="1" min="1" onfocus="this.select()"></td>
-                        <td>поле(я)</td>
-                        <td><input class="btn" type="button" name="submit_num_fields" value="Вперёд"></td>
+                        <td><input class="btn submit_num_fields" type="button" name="submit_num_fields" value="Добавить поле"></td>
                      </tr>
                   </tbody>
                </table>
-               <hr>
-               <table class="addtobase__table">
+               <table class="addtobase__table" id="new-fields">
                   <thead>
                      <tr>
                         <th>Имя</th>
@@ -171,106 +256,59 @@ if(isset($_POST['table_name'])){
                   </thead>
                   <tbody>
                      <tr>
-                        <td><input type="text"></td>
+                        <td><input type="text" name="field_name[]"></td>
                         <td>
-                           <select name="type">
-                              <option value="int">INT</option>
-                              <option value="varchar">VARCHAR</option>
-                              <option value="text">TEXT</option>
+                           <select name="type[]">
+                              <option value="INT">INT</option>
+                              <option value="VARCHAR">VARCHAR</option>
+                              <option value="TEXT">TEXT</option>
                            </select>
                         </td>
-                        <td><input class="small" type="number"></td>
+                        <td><input class="small" type="number" min="1" name="length[]"></td>
                         <td>
-                           <select name="21321">
-                              <option value="primary">primary</option>
-                              <option value="unique">unique</option>
-                              <option value="index">index</option>
-                              <option value="fulltext">fulltext</option>
-                              <option value="spatial">spatial</option>
+                           <select name="index[]">
+                              <option value="PRIMARY">PRIMARY</option>
+                              <option value="UNIQUE">UNIQUE</option>
+                              <option value="INDEX">INDEX</option>
+                              <option value="FULLTEXT">FULLTEXT</option>
+                              <option value="SPATIAL">SPATIAL</option>
                            </select>
                         </td>
                         <td>
-                           <input type="checkbox" name="ai">
+                           <input type="checkbox" name="ai[]">
                         </td>
                      </tr>
                      <tr>
-                        <td><input type="text"></td>
+                        <td><input type="text" name="field_name[]"></td>
                         <td>
-                           <select name="type">
-                              <option value="int">INT</option>
-                              <option value="varchar">VARCHAR</option>
-                              <option value="text">TEXT</option>
+                           <select name="type[]">
+                              <option value="INT">INT</option>
+                              <option value="VARCHAR">VARCHAR</option>
+                              <option value="TEXT">TEXT</option>
                            </select>
                         </td>
-                        <td><input class="small" type="number"></td>
+                        <td><input class="small" type="number" min="1" name="length[]"></td>
                         <td>
-                           <select name="21321">
-                              <option value="primary">primary</option>
-                              <option value="unique">unique</option>
-                              <option value="index">index</option>
-                              <option value="fulltext">fulltext</option>
-                              <option value="spatial">spatial</option>
-                           </select>
-                        </td>
-                        <td>
-                           <input type="checkbox" name="ai">
-                        </td>
-                     </tr>
-                     <tr>
-                        <td><input type="text"></td>
-                        <td>
-                           <select name="type">
-                              <option value="int">INT</option>
-                              <option value="varchar">VARCHAR</option>
-                              <option value="text">TEXT</option>
-                           </select>
-                        </td>
-                        <td><input class="small" type="number"></td>
-                        <td>
-                           <select name="21321">
-                              <option value="primary">primary</option>
-                              <option value="unique">unique</option>
-                              <option value="index">index</option>
-                              <option value="fulltext">fulltext</option>
-                              <option value="spatial">spatial</option>
+                           <select name="index[]">
+                              <option value="PRIMARY">PRIMARY</option>
+                              <option value="UNIQUE">UNIQUE</option>
+                              <option value="INDEX">INDEX</option>
+                              <option value="FULLTEXT">FULLTEXT</option>
+                              <option value="SPATIAL">SPATIAL</option>
                            </select>
                         </td>
                         <td>
-                           <input type="checkbox" name="ai">
-                        </td>
-                     </tr>
-                     <tr>
-                        <td><input type="text"></td>
-                        <td>
-                           <select name="type">
-                              <option value="int">INT</option>
-                              <option value="varchar">VARCHAR</option>
-                              <option value="text">TEXT</option>
-                           </select>
-                        </td>
-                        <td><input class="small" type="number"></td>
-                        <td>
-                           <select name="21321">
-                              <option value="primary">primary</option>
-                              <option value="unique">unique</option>
-                              <option value="index">index</option>
-                              <option value="fulltext">fulltext</option>
-                              <option value="spatial">spatial</option>
-                           </select>
-                        </td>
-                        <td>
-                           <input type="checkbox" name="ai">
+                           <input type="checkbox" name="ai[]">
                         </td>
                      </tr>
                   </tbody>
                </table>  
-               <hr>
                <table class="addtobase__table">
                   <tbody>
                      <tr>
                         <td><input type="text" name="comment" placeholder="Комментарии к таблице:"></td>
                         <td>
-                           <select name="type_table" required>
+                           <select name="engine" required>
                               <option value="" disabled selected>Тип таблиц:</option>
                               <option value="csv" title="Stores tables as CSV files">CSV</option>
                               <option value="mrg_myisam" title="Collection of identical MyISAM tables">MRG_MyISAM</option>
@@ -288,29 +326,6 @@ if(isset($_POST['table_name'])){
                   </tbody>
                </table> 
             </form>
-            <?php
-
-            // $mysql_host = 'localhost';
-            // $mysql_username = 'root';
-            // $mysql_password = '';
-            // $mysql_database = 'yangibaza';
-
-            // $dd = mysqli_connect($mysql_host, $mysql_username, $mysql_password, $mysql_database) or die('Error connecting to MySQL server: ' . mysql_error());
-
-            // $templine = '';
-            // $lines = file($filename);
-            // foreach ($lines as $line) {
-            //    if (substr($line, 0, 2) == '--' || $line == '') continue;
-
-            //    $templine .= $line;
-            //    if (substr(trim($line), -1, 1) == ';') {
-            //    $mys = mysqli_query($dd, $templine);
-            //    echo $templine.'<br>';
-            //    $templine = '';
-            //    }
-            // }
-
-            ?>
          </div>
       </div>
 
@@ -324,22 +339,7 @@ if(isset($_POST['table_name'])){
             <h2 class="modals__title">Добавить новый база данных</h2>
             <div class="modals__close" target=".add_db"></div>
          </div>
-         <form action="#" method="post">
-            <div class="modals__body">
-               <label for="db_name">Имя нового базу данных:</label>
-               <input type="text" name="db_name" id="db_name">
-            </div>
-            <div class="modals__footer">
-               <input type="submit" class="btn" value="Добавить">
-            </div>
-         </form>
-      </div>
-      <div class="item add_db2">
-         <div class="modals__header">
-            <h2 class="modals__title">Добавить новый база данных</h2>
-            <div class="modals__close"></div>
-         </div>
-         <form action="#" method="post">
+         <form id="add_db_form">
             <div class="modals__body">
                <label for="db_name">Имя нового базу данных:</label>
                <input type="text" name="db_name" id="db_name">
@@ -350,6 +350,7 @@ if(isset($_POST['table_name'])){
          </form>
       </div>
    </div>
+   <div id="output"></div>
    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
    <!-- Owl-carousel -->
    <script src="/node_modules/owl.carousel/dist/owl.carousel.min.js"></script>
@@ -372,6 +373,92 @@ if(isset($_POST['table_name'])){
          let thisid = $(this).attr('target');
          $('.modals').css("display", "none");
          $(thisid).removeClass("active");
+      });
+
+      $("#add_db_form").on('submit',(function(el) {
+         el.preventDefault();
+         $.ajax({
+               url: 'actions/add_db.php',
+               type: "POST",
+               data:  new FormData(this),
+               contentType: false,
+               cache: false,
+               processData:false,
+               success: function(data){
+                  $("#output").html(data);
+               }
+         });
+      }));
+      $("#addtobase_form").on('submit',(function(el) {
+         el.preventDefault();
+         $.ajax({
+               url: 'actions/add_table.php',
+               type: "POST",
+               data:  new FormData(this),
+               contentType: false,
+               cache: false,
+               processData:false,
+               success: function(data){
+                  $("#output").html(data);
+               }
+         });
+      }));
+      $("#add-in-table").on('submit',(function(el) {
+         el.preventDefault();
+         $.ajax({
+               url: 'actions/add_in_table.php',
+               type: "POST",
+               data:  new FormData(this),
+               contentType: false,
+               cache: false,
+               processData:false,
+               success: function(data){
+                  $("#output").html(data);
+               }
+         });
+      }));
+
+      $(".submit_num_fields").on("click", function () {
+         var newRow = $("<tr>");
+         
+         var cols = "";
+         cols += '<td><input type="text" name="field_name[]"></td>';
+         cols += '<td><select name="type[]"><option value="INT">INT</option><option value="VARCHAR">VARCHAR</option><option value="TEXT">TEXT</option></select></td>';
+         cols += '<td><input class="small" type="number" min="1" name="length[]"></td>';
+         cols += '<td><select name="index[]"><option value="PRIMARY">PRIMARY</option><option value="UNIQUE">UNIQUE</option><option value="INDEX">INDEX</option><option value="FULLTEXT">FULLTEXT</option><option value="SPATIAL">SPATIAL</option></select></td>';
+         cols += '<td><input type="checkbox" name="ai[]"></td>';
+
+         newRow.append(cols);
+         $("#new-fields").append(newRow);
+      });
+
+      $( ".add-field" ).click(function() {
+
+      //    $('.summa').each(function() {
+      //       if($(this).text()!=""){
+      //       totalAmount += parseInt($(this).html());
+      //       }
+      //       if(totalAmount > 0){
+      //       $(".nextBtn").removeClass('uchiq');
+      //       }else{
+      //       $(".nextBtn").addClass('uchiq');
+      //       }
+      //   });
+
+         $('.fields').each(function() {
+            
+            let target = $(this).attr("data-field");
+            console.log(target)
+            
+            var newRow = $("<tr>");
+            cols = "";
+
+            cols += '<td>'+target+'</td><td><input type="text" name="'+target+'[]"></td>';
+
+            newRow.append(cols);
+            $("#add-to-tables-form").append(newRow);
+
+         });
       });
    </script>
 </body>
